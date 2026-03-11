@@ -1,0 +1,1471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NCL Mobile Prototype v32 — iPhone 16 Pro</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=Besley:ital,wght@0,400;1,400&family=DM+Sans:wght@300;400;500;600&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Anton&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    /* NCL Theme — Brand Guidelines Nov 2025 */
+    --ncl-sand: #EBE7DF;
+    --ncl-aqua: #A7CAC6;
+    --ncl-yellow: #E6CD88;
+    --ncl-teal: #68ACAA;
+    --ncl-medium-blue: #8EBFC2;
+    --ncl-ncl-blue: #0A84BD;
+    --ncl-ocean-blue: #006099;
+    --ncl-turquoise: #00484F;
+    --ncl-salmon: #FF938A;
+    --ncl-black: #1A1A18;
+    --ncl-hero-overlay: linear-gradient(180deg, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.0) 35%, rgba(0,72,79,0.82) 100%);
+
+    /* Oceania Theme */
+    --oceania-primary: #8B2635;
+    --oceania-secondary: #3D2314;
+    --oceania-accent: #C4973A;
+    --oceania-surface: #FAF6F0;
+    --oceania-text: #1A0F0A;
+    --oceania-text-light: #6B5040;
+    --oceania-hero-overlay: linear-gradient(180deg, rgba(61,35,20,0.25) 0%, rgba(61,35,20,0.0) 40%, rgba(61,35,20,0.9) 100%);
+    --oceania-nora-bg: #3D2314;
+    --oceania-nora-text: #FAF6F0;
+    --oceania-nora-accent: #C4973A;
+    --oceania-card-bg: #FFFCF7;
+    --oceania-font-display: 'Cormorant Garamond', serif;
+    --oceania-font-body: 'DM Sans', sans-serif;
+
+    /* Regent Theme */
+    --regent-primary: #0A0A0A;
+    --regent-secondary: #1A1A1A;
+    --regent-accent: #C9A84C;
+    --regent-surface: #F8F8F8;
+    --regent-text: #0A0A0A;
+    --regent-text-light: #666666;
+    --regent-hero-overlay: linear-gradient(180deg, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.0) 35%, rgba(0,0,0,0.92) 100%);
+    --regent-nora-bg: #0A0A0A;
+    --regent-nora-text: #FFFFFF;
+    --regent-nora-accent: #C9A84C;
+    --regent-card-bg: #FFFFFF;
+    --regent-font-display: 'Anton', sans-serif;
+    --regent-font-body: 'DM Sans', sans-serif;
+  }
+
+  body {
+    background: #1a1a1a;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    font-family: 'DM Sans', sans-serif;
+    padding: 20px 0 40px;
+  }
+
+  /* Theme switcher */
+  .theme-switcher {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 24px;
+    background: rgba(255,255,255,0.08);
+    padding: 6px;
+    border-radius: 50px;
+  }
+  .theme-btn {
+    padding: 8px 20px;
+    border-radius: 50px;
+    border: none;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    transition: all 0.3s ease;
+    color: rgba(255,255,255,0.5);
+    background: transparent;
+  }
+  .theme-btn.active { color: #0A0A0A; }
+  .theme-btn[data-theme="ncl"].active { background: #00484F; color: #EBE7DF; }
+  .theme-btn[data-theme="oceania"].active { background: #8B2635; color: #FAF6F0; }
+  .theme-btn[data-theme="regent"].active { background: #C9A84C; color: #0A0A0A; }
+
+  /* Phone shell */
+  .phone-shell {
+    width: 393px;
+    height: 852px;
+    background: #000;
+    border-radius: 55px;
+    box-shadow:
+      0 0 0 2px #333,
+      0 0 0 4px #555,
+      0 40px 100px rgba(0,0,0,0.8),
+      inset 0 0 0 1px rgba(255,255,255,0.05);
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Dynamic Island */
+  .dynamic-island {
+    position: absolute;
+    top: 14px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 120px;
+    height: 35px;
+    background: #000;
+    border-radius: 20px;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  .dynamic-island::before {
+    content: '';
+    width: 12px;
+    height: 12px;
+    background: #1a1a1a;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+  .dynamic-island::after {
+    content: '';
+    width: 8px;
+    height: 8px;
+    background: #111;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.08);
+  }
+
+  /* Screen */
+  .screen {
+    position: absolute;
+    inset: 0;
+    border-radius: 55px;
+    overflow: hidden;
+    background: var(--surface-color, #F5F3EF);
+  }
+
+  /* Scrollable content */
+  .scroll-content {
+    height: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+    scroll-behavior: smooth;
+    padding-bottom: 90px;
+    -webkit-overflow-scrolling: touch;
+  }
+  .scroll-content::-webkit-scrollbar { display: none; }
+
+  /* ========== TOP NAV ========== */
+  .top-nav {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 62px 20px 14px;
+    background: transparent;
+    transition: background 0.3s ease, box-shadow 0.3s ease;
+  }
+  .top-nav.scrolled {
+    background: rgba(255,255,255,1);
+    box-shadow: 0 1px 12px rgba(0,0,0,0.08);
+  }
+  .nav-logo {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .nav-logo svg {
+    height: 36px;
+    width: auto;
+    filter: none;
+  }
+  .nav-logo-text {
+    font-size: 22px;
+    font-weight: 900;
+    letter-spacing: -0.02em;
+    color: #1A1A18;
+    text-shadow: none;
+  }
+  .nav-menu {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+    cursor: pointer;
+    z-index: 1;
+  }
+  .nav-menu span {
+    display: block;
+    height: 2px;
+    background: #1A1A18;
+    border-radius: 2px;
+    width: 100%;
+  }
+  .nav-menu span:nth-child(2) { width: 68%; }
+  .nav-find-cruises {
+    z-index: 1;
+    padding: 7px 12px;
+    border-radius: 50px;
+    border: 1.5px solid #1A1A18;
+    background: transparent;
+    color: #1A1A18;
+    font-family: 'Poppins', sans-serif;
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+  }
+  .nav-find-cruises:active { background: rgba(0,0,0,0.05); }
+  .top-nav.scrolled .nav-find-cruises {
+    border-color: #1A1A18;
+    color: #1A1A18;
+  }
+
+  /* ========== HERO ========== */
+  .hero {
+    position: relative;
+    height: 520px;
+    overflow: hidden;
+    flex-shrink: 0;
+    margin-top: -112px;
+  }
+  .hero-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .hero-overlay {
+    position: absolute;
+    inset: 0;
+  }
+  .hero-content {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 0 24px 28px;
+  }
+  .hero-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.7);
+    margin-bottom: 8px;
+  }
+  .hero-title {
+    font-size: 42px;
+    line-height: 1.0;
+    color: white;
+    margin-bottom: 16px;
+    text-shadow: 0 2px 20px rgba(0,0,0,0.4);
+  }
+  .hero-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 22px;
+    border-radius: 50px;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    border: none;
+    transition: transform 0.2s ease;
+  }
+  .hero-cta:active { transform: scale(0.97); }
+  .hero-cta svg { width: 16px; height: 16px; }
+  .hero-perks {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 16px;
+  }
+  .hero-perk {
+    font-family: 'Poppins', sans-serif;
+    font-size: 13px;
+    font-weight: 400;
+    color: rgba(255,255,255,0.92);
+    text-shadow: 0 1px 6px rgba(0,0,0,0.4);
+    letter-spacing: 0.01em;
+  }
+
+  /* ========== DESTINATIONS ========== */
+  .section {
+    padding: 28px 0;
+    background: var(--section-bg, #F5F3EF);
+  }
+  .section-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    padding: 0 24px;
+    margin-bottom: 16px;
+  }
+  .section-title {
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1.2;
+  }
+  .section-link {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    opacity: 1;
+    cursor: pointer;
+  }
+
+  /* Pill chips */
+  .chips-scroll {
+    display: flex;
+    gap: 8px;
+    padding: 0 24px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .chips-scroll::-webkit-scrollbar { display: none; }
+  .chip {
+    flex-shrink: 0;
+    padding: 9px 18px;
+    border-radius: 50px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    border: 1.5px solid transparent;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+  }
+  .chip.active { border-color: transparent; }
+
+  /* ========== VOYAGE CARDS ========== */
+  .cards-scroll {
+    display: flex;
+    gap: 14px;
+    padding: 4px 24px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .cards-scroll::-webkit-scrollbar { display: none; }
+  .voyage-card {
+    flex-shrink: 0;
+    width: 260px;
+    border-radius: 20px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+  }
+  .voyage-card:active { transform: scale(0.98); }
+  .card-img-wrap {
+    position: relative;
+    height: 160px;
+    overflow: hidden;
+  }
+  .card-img-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+  }
+  .voyage-card:hover .card-img-wrap img { transform: scale(1.05); }
+  .card-badge {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    padding: 4px 10px;
+    border-radius: 50px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .card-body {
+    padding: 14px 16px 16px;
+  }
+  .card-nights {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    opacity: 0.5;
+    margin-bottom: 4px;
+  }
+  .card-title {
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 10px;
+  }
+  .card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .card-price {
+    font-size: 18px;
+    font-weight: 800;
+  }
+  .card-price span {
+    font-size: 11px;
+    font-weight: 400;
+    opacity: 0.5;
+  }
+  .card-price-affix {
+    font-size: 11px !important;
+    font-weight: 400 !important;
+    opacity: 0.5 !important;
+    color: #5A6060 !important;
+  }
+  .card-btn {
+    padding: 7px 14px;
+    border-radius: 50px;
+    font-size: 11px;
+    font-weight: 700;
+    border: none;
+    cursor: pointer;
+    letter-spacing: 0.04em;
+  }
+
+  /* ========== NORA FEATURE ========== */
+  .nora-feature {
+    margin: 8px 24px;
+    border-radius: 24px;
+    padding: 24px;
+    position: relative;
+    overflow: hidden;
+  }
+  .nora-feature-bg {
+    position: absolute;
+    inset: 0;
+    opacity: 0.08;
+    background-image: radial-gradient(circle at 80% 50%, currentColor 0%, transparent 60%);
+  }
+  .nora-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 12px;
+    border-radius: 50px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  .nora-tag-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.6; transform: scale(0.8); }
+  }
+  .nora-feature-title {
+    font-size: 26px;
+    font-weight: 700;
+    line-height: 1.15;
+    margin-bottom: 8px;
+  }
+  .nora-feature-subtitle {
+    font-size: 13px;
+    line-height: 1.5;
+    opacity: 0.7;
+    margin-bottom: 18px;
+  }
+  .nora-sample-prompts {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .nora-prompt-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    border-radius: 14px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: transform 0.15s ease;
+    border: 1px solid rgba(255,255,255,0.12);
+    backdrop-filter: blur(8px);
+  }
+  .nora-prompt-pill:active { transform: scale(0.98); }
+  .nora-prompt-pill svg { width: 14px; height: 14px; opacity: 0.6; flex-shrink: 0; }
+
+  /* ========== FLEET ========== */
+  .ship-cards {
+    display: flex;
+    gap: 14px;
+    padding: 4px 24px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .ship-cards::-webkit-scrollbar { display: none; }
+  .ship-card {
+    flex-shrink: 0;
+    width: 180px;
+    border-radius: 18px;
+    overflow: hidden;
+    position: relative;
+    height: 220px;
+    cursor: pointer;
+  }
+  .ship-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center center;
+  }
+  .ship-cards .ship-card:nth-child(1) img { object-position: right center; }
+  .ship-cards .ship-card:nth-child(3) img { object-position: right center; }
+  .ship-card-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, transparent 40%, rgba(0,0,0,0.85) 100%);
+  }
+  .ship-card-content {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 14px;
+  }
+  .ship-name {
+    font-size: 14px;
+    font-weight: 700;
+    color: white;
+    line-height: 1.2;
+    margin-bottom: 3px;
+  }
+  .ship-guests {
+    font-size: 11px;
+    color: rgba(255,255,255,0.6);
+  }
+
+  /* ========== PROMO BANNER ========== */
+  .promo-banner {
+    margin: 8px 24px;
+    border-radius: 20px;
+    padding: 22px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+  }
+  .promo-banner:active { transform: scale(0.99); }
+  .promo-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 22px;
+  }
+  .promo-text-title {
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 3px;
+  }
+  .promo-text-sub {
+    font-size: 12px;
+    opacity: 0.65;
+    line-height: 1.4;
+  }
+  .promo-arrow {
+    margin-left: auto;
+    opacity: 0.4;
+    flex-shrink: 0;
+  }
+
+  /* ========== FOOTER DISCLAIMER ========== */
+  .footer-disclaimer {
+    padding: 0 24px 24px;
+  }
+  .footer-divider {
+    width: 100%;
+    height: 1px;
+    background: rgba(0,0,0,0.12);
+    margin-bottom: 16px;
+  }
+  .footer-text {
+    font-family: 'Poppins', sans-serif;
+    font-size: 11px;
+    font-weight: 400;
+    line-height: 1.6;
+    color: rgba(0,0,0,0.45);
+  }
+  .footer-link {
+    color: #0A84BD;
+    text-decoration: underline;
+  }
+  body[data-theme="oceania"] .footer-link { color: #8B2635; }
+  body[data-theme="regent"] .footer-link { color: #C9A84C; }
+  body[data-theme="regent"] .footer-text { color: rgba(0,0,0,0.4); }
+
+  /* ========== STICKY NORA FOOTER ========== */
+  .nora-footer {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 90;
+    padding: 10px 16px 28px;
+    backdrop-filter: blur(20px) saturate(180%);
+    border-top: 1px solid rgba(255,255,255,0.08);
+    transition: all 0.3s ease;
+  }
+  .nora-footer-inner {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    border-radius: 18px;
+    cursor: pointer;
+    transition: transform 0.15s ease;
+    border: 1px solid rgba(255,255,255,0.12);
+  }
+  .nora-footer-inner:active { transform: scale(0.99); }
+  .nora-avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 15px;
+    font-weight: 900;
+    letter-spacing: -0.05em;
+  }
+  .nora-placeholder {
+    flex: 1;
+    font-size: 14px;
+    opacity: 0.55;
+    font-weight: 400;
+  }
+  .nora-actions {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+  .nora-action-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.15s ease;
+  }
+  .nora-action-btn:active { transform: scale(0.9); }
+  .nora-action-btn svg { width: 16px; height: 16px; }
+
+  /* =========== NORA EXPANDED STATE =========== */
+  .nora-expanded {
+    display: none;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 95;
+    border-radius: 28px 28px 0 0;
+    padding: 20px 20px 36px;
+    animation: slideUp 0.35s cubic-bezier(0.32, 0.72, 0, 1);
+  }
+  .nora-expanded.open { display: block; }
+  @keyframes slideUp {
+    from { transform: translateY(100%); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+  .nora-exp-handle {
+    width: 36px;
+    height: 4px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 2px;
+    margin: 0 auto 20px;
+    cursor: pointer;
+  }
+  .nora-exp-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  .nora-exp-avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    font-weight: 900;
+    letter-spacing: -0.05em;
+  }
+  .nora-exp-title { font-size: 17px; font-weight: 700; }
+  .nora-exp-subtitle { font-size: 12px; opacity: 0.5; margin-top: 1px; }
+  .nora-chat-bubble {
+    padding: 14px 16px;
+    border-radius: 18px 18px 18px 4px;
+    font-size: 14px;
+    line-height: 1.5;
+    margin-bottom: 16px;
+    max-width: 85%;
+  }
+  .nora-sugg-title {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    opacity: 0.5;
+    margin-bottom: 8px;
+  }
+  .nora-suggestions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+  .nora-sugg {
+    padding: 8px 14px;
+    border-radius: 50px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    border: 1px solid rgba(255,255,255,0.15);
+    transition: all 0.15s ease;
+  }
+  .nora-sugg:active { transform: scale(0.97); }
+  .nora-input-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+  .nora-input {
+    flex: 1;
+    padding: 12px 16px;
+    border-radius: 14px;
+    font-size: 14px;
+    border: 1px solid rgba(255,255,255,0.15);
+    outline: none;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .nora-send-btn {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  .nora-send-btn svg { width: 18px; height: 18px; }
+
+  /* ========== THEME APPLICATION ========== */
+
+  /* NCL */
+  /* === NCL THEME — Brand-accurate (Nov 2025 Guidelines) === */
+  body[data-theme="ncl"] .screen { background: #EBE7DF; }
+  body[data-theme="ncl"] .section { background: #EBE7DF; }
+
+  /* Typography — Poppins SemiBold ALL CAPS + Besley Italic accent */
+  body[data-theme="ncl"] .section-title {
+    font-family: 'Poppins', sans-serif; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.18em;
+    font-size: 13px; color: #00484F;
+  }
+  body[data-theme="ncl"] .section-link { color: #006099; font-family: 'Poppins', sans-serif; font-weight: 600; }
+  body[data-theme="ncl"] .hero-title {
+    font-family: 'Poppins', sans-serif; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.04em; font-size: 38px;
+  }
+  body[data-theme="ncl"] .hero-label {
+    font-family: 'Besley', serif; font-style: italic; font-weight: 400;
+    font-size: 14px; letter-spacing: 0.02em;
+  }
+  body[data-theme="ncl"] .hero-overlay { background: var(--ncl-hero-overlay); }
+  body[data-theme="ncl"] .hero-cta {
+    background: #E6CD88; color: #00484F;
+    font-family: 'Poppins', sans-serif; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.12em; font-size: 10px;
+  }
+
+  /* Destination chips */
+  body[data-theme="ncl"] .chip {
+    background: rgba(255,255,255,0.65); color: #00484F;
+    border-color: rgba(0,72,79,0.2);
+    font-family: 'Poppins', sans-serif; font-weight: 600;
+    font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em;
+  }
+  body[data-theme="ncl"] .chip.active {
+    background: #00484F; color: #EBE7DF; border-color: #00484F;
+  }
+
+  /* Voyage cards */
+  body[data-theme="ncl"] .voyage-card { background: white; box-shadow: 0 2px 16px rgba(0,72,79,0.1); }
+  body[data-theme="ncl"] .card-badge { background: #E6CD88; color: #00484F; }
+  body[data-theme="ncl"] .card-nights {
+    font-family: 'Besley', serif; font-style: italic; color: #68ACAA; opacity: 1;
+  }
+  body[data-theme="ncl"] .card-title {
+    font-family: 'Poppins', sans-serif; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.06em; font-size: 13px; color: #1A1A18;
+  }
+  body[data-theme="ncl"] .card-price { color: #006099; font-family: 'Poppins', sans-serif; font-weight: 700; }
+  body[data-theme="ncl"] .card-btn {
+    background: #00484F; color: #EBE7DF;
+    font-family: 'Poppins', sans-serif; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.08em; font-size: 10px;
+  }
+
+  /* Nora feature card */
+  body[data-theme="ncl"] .nora-feature {
+    background: linear-gradient(135deg, #00484F 0%, #006099 100%);
+  }
+  body[data-theme="ncl"] .nora-feature-title {
+    font-family: 'Poppins', sans-serif; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.06em;
+    font-size: 22px; color: #EBE7DF; line-height: 1.1;
+  }
+  body[data-theme="ncl"] .nora-feature-subtitle { color: rgba(235,231,223,0.75); font-family: 'Poppins', sans-serif; }
+  body[data-theme="ncl"] .nora-tag { background: rgba(230,205,136,0.2); color: #E6CD88; }
+  body[data-theme="ncl"] .nora-tag-dot { background: #E6CD88; }
+  body[data-theme="ncl"] .nora-prompt-pill {
+    background: rgba(235,231,223,0.1); color: rgba(235,231,223,0.9);
+    font-family: 'Poppins', sans-serif; font-size: 12px;
+  }
+
+  /* Sticky Nora footer */
+  body[data-theme="ncl"] .nora-footer { background: rgba(0,72,79,0.97); }
+  body[data-theme="ncl"] .nora-footer-inner { background: rgba(167,202,198,0.12); border-color: rgba(167,202,198,0.2); }
+  body[data-theme="ncl"] .nora-placeholder { color: rgba(235,231,223,0.85); font-family: 'Poppins', sans-serif; font-weight: 300; }
+  body[data-theme="ncl"] .nora-avatar { background: transparent; }
+  body[data-theme="ncl"] .nora-action-btn { background: rgba(167,202,198,0.15); }
+  body[data-theme="ncl"] .nora-action-btn svg { stroke: rgba(235,231,223,0.8); }
+
+  /* Nora expanded panel */
+  body[data-theme="ncl"] .nora-expanded {
+    background: linear-gradient(180deg, #00484F 0%, #003538 100%);
+  }
+  body[data-theme="ncl"] .nora-exp-avatar { background: transparent; }
+  body[data-theme="ncl"] .nora-exp-title {
+    color: #EBE7DF; font-family: 'Poppins', sans-serif;
+    font-weight: 700; text-transform: uppercase; letter-spacing: 0.15em; font-size: 14px;
+  }
+  body[data-theme="ncl"] .nora-exp-subtitle { color: rgba(167,202,198,0.8); font-family: 'Poppins', sans-serif; }
+  body[data-theme="ncl"] .nora-chat-bubble { background: rgba(167,202,198,0.15); color: rgba(235,231,223,0.95); font-family: 'Poppins', sans-serif; font-weight: 300; }
+  body[data-theme="ncl"] .nora-sugg-title { color: rgba(235,231,223,0.6); font-family: 'Poppins', sans-serif; }
+  body[data-theme="ncl"] .nora-sugg {
+    background: rgba(230,205,136,0.12); color: rgba(235,231,223,0.9);
+    border-color: rgba(230,205,136,0.2);
+    font-family: 'Poppins', sans-serif; font-size: 11px; font-weight: 500;
+  }
+  body[data-theme="ncl"] .nora-input {
+    background: rgba(235,231,223,0.08); color: #EBE7DF;
+    font-family: 'Poppins', sans-serif;
+  }
+  body[data-theme="ncl"] .nora-input::placeholder { color: rgba(235,231,223,0.3); }
+  body[data-theme="ncl"] .nora-send-btn { background: #E6CD88; }
+  body[data-theme="ncl"] .nora-send-btn svg { stroke: #00484F; }
+
+  /* Promo banner */
+  body[data-theme="ncl"] .promo-banner { background: #A7CAC6; box-shadow: none; }
+  body[data-theme="ncl"] .promo-icon { background: rgba(0,72,79,0.12); }
+  body[data-theme="ncl"] .promo-text-title {
+    color: #00484F; font-family: 'Poppins', sans-serif;
+    font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; font-size: 13px;
+  }
+  body[data-theme="ncl"] .promo-text-sub { color: rgba(0,72,79,0.75); font-family: 'Poppins', sans-serif; }
+  body[data-theme="ncl"] .promo-arrow svg { stroke: #00484F; }
+
+  /* Nav logo — NCL uses SVG shield, no font override needed */
+
+  /* Oceania */
+  body[data-theme="oceania"] .section { background: #FAF6F0; }
+  body[data-theme="oceania"] .section-title { font-family: 'Cormorant Garamond', serif; color: #3D2314; font-size: 24px; font-weight: 600; font-style: italic; }
+  body[data-theme="oceania"] .section-link { color: #8B2635; }
+  body[data-theme="oceania"] .hero-title { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 46px; }
+  body[data-theme="oceania"] .hero-overlay { background: var(--oceania-hero-overlay); }
+  body[data-theme="oceania"] .hero-cta { background: #C4973A; color: #1A0F0A; }
+  body[data-theme="oceania"] .chip { background: rgba(196,151,58,0.1); color: #3D2314; border-color: rgba(196,151,58,0.3); }
+  body[data-theme="oceania"] .chip.active { background: #3D2314; color: #FAF6F0; border-color: #3D2314; }
+  body[data-theme="oceania"] .voyage-card { background: #FFFCF7; }
+  body[data-theme="oceania"] .card-badge { background: #C4973A; color: #1A0F0A; }
+  body[data-theme="oceania"] .card-title { font-family: 'Cormorant Garamond', serif; color: #3D2314; font-size: 18px; font-style: italic; }
+  body[data-theme="oceania"] .card-price { color: #8B2635; }
+  body[data-theme="oceania"] .card-btn { background: #3D2314; color: #FAF6F0; }
+  body[data-theme="oceania"] .nora-feature { background: #3D2314; }
+  body[data-theme="oceania"] .nora-feature-title { font-family: 'Cormorant Garamond', serif; color: #FAF6F0; font-size: 30px; font-style: italic; }
+  body[data-theme="oceania"] .nora-feature-subtitle { color: rgba(250,246,240,0.7); }
+  body[data-theme="oceania"] .nora-tag { background: rgba(196,151,58,0.25); color: #C4973A; }
+  body[data-theme="oceania"] .nora-tag-dot { background: #C4973A; }
+  body[data-theme="oceania"] .nora-prompt-pill { background: rgba(250,246,240,0.08); color: rgba(250,246,240,0.85); }
+  body[data-theme="oceania"] .nora-footer { background: rgba(61,35,20,0.97); }
+  body[data-theme="oceania"] .nora-footer-inner { background: rgba(250,246,240,0.06); }
+  body[data-theme="oceania"] .nora-placeholder { color: rgba(250,246,240,0.85); }
+  body[data-theme="oceania"] .nora-avatar { background: #C4973A; color: #1A0F0A; font-family: 'Cormorant Garamond', serif; font-style: italic; }
+  body[data-theme="oceania"] .nora-action-btn { background: rgba(250,246,240,0.08); }
+  body[data-theme="oceania"] .nora-action-btn svg { stroke: rgba(250,246,240,0.7); }
+  body[data-theme="oceania"] .nora-expanded { background: #3D2314; }
+  body[data-theme="oceania"] .nora-exp-avatar { background: #C4973A; color: #1A0F0A; }
+  body[data-theme="oceania"] .nora-exp-title { color: #FAF6F0; font-family: 'Cormorant Garamond', serif; }
+  body[data-theme="oceania"] .nora-exp-subtitle { color: rgba(250,246,240,0.5); }
+  body[data-theme="oceania"] .nora-chat-bubble { background: rgba(250,246,240,0.1); color: rgba(250,246,240,0.9); }
+  body[data-theme="oceania"] .nora-sugg { background: rgba(196,151,58,0.15); color: rgba(250,246,240,0.85); border-color: rgba(196,151,58,0.25); }
+  body[data-theme="oceania"] .nora-input { background: rgba(250,246,240,0.07); color: #FAF6F0; }
+  body[data-theme="oceania"] .nora-input::placeholder { color: rgba(250,246,240,0.3); }
+  body[data-theme="oceania"] .nora-send-btn { background: #C4973A; }
+  body[data-theme="oceania"] .nora-send-btn svg { stroke: #1A0F0A; }
+  body[data-theme="oceania"] .promo-banner { background: #FFFCF7; box-shadow: 0 2px 16px rgba(61,35,20,0.1); }
+  body[data-theme="oceania"] .promo-icon { background: rgba(196,151,58,0.12); }
+  body[data-theme="oceania"] .promo-text-title { color: #3D2314; font-family: 'Cormorant Garamond', serif; font-size: 17px; font-style: italic; }
+  body[data-theme="oceania"] .promo-text-sub { color: #6B5040; }
+  body[data-theme="oceania"] .nav-logo { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 26px; letter-spacing: 0.05em; }
+
+  /* Regent */
+  body[data-theme="regent"] .section { background: #F8F8F8; }
+  body[data-theme="regent"] .section-title { font-family: 'Anton', sans-serif; color: #0A0A0A; letter-spacing: 0.02em; text-transform: uppercase; font-size: 18px; }
+  body[data-theme="regent"] .section-link { color: #C9A84C; }
+  body[data-theme="regent"] .hero-title { font-family: 'Anton', sans-serif; text-transform: uppercase; letter-spacing: 0.01em; font-size: 48px; }
+  body[data-theme="regent"] .hero-overlay { background: var(--regent-hero-overlay); }
+  body[data-theme="regent"] .hero-cta { background: #C9A84C; color: #0A0A0A; font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; font-size: 11px; }
+  body[data-theme="regent"] .chip { background: white; color: #0A0A0A; border-color: rgba(0,0,0,0.12); }
+  body[data-theme="regent"] .chip.active { background: #0A0A0A; color: white; border-color: #0A0A0A; }
+  body[data-theme="regent"] .voyage-card { background: white; }
+  body[data-theme="regent"] .card-badge { background: #C9A84C; color: #0A0A0A; }
+  body[data-theme="regent"] .card-title { font-family: 'Anton', sans-serif; color: #0A0A0A; text-transform: uppercase; letter-spacing: 0.02em; font-size: 15px; }
+  body[data-theme="regent"] .card-price { color: #0A0A0A; }
+  body[data-theme="regent"] .card-btn { background: #0A0A0A; color: white; }
+  body[data-theme="regent"] .nora-feature { background: #0A0A0A; }
+  body[data-theme="regent"] .nora-feature-title { font-family: 'Anton', sans-serif; color: white; text-transform: uppercase; letter-spacing: 0.02em; font-size: 28px; line-height: 1.0; }
+  body[data-theme="regent"] .nora-feature-subtitle { color: rgba(255,255,255,0.6); }
+  body[data-theme="regent"] .nora-tag { background: rgba(201,168,76,0.2); color: #C9A84C; }
+  body[data-theme="regent"] .nora-tag-dot { background: #C9A84C; }
+  body[data-theme="regent"] .nora-prompt-pill { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.8); }
+  body[data-theme="regent"] .nora-footer { background: rgba(10,10,10,0.97); }
+  body[data-theme="regent"] .nora-footer-inner { background: rgba(255,255,255,0.06); }
+  body[data-theme="regent"] .nora-placeholder { color: rgba(255,255,255,0.85); }
+  body[data-theme="regent"] .nora-avatar { background: #C9A84C; color: #0A0A0A; font-family: 'Anton', sans-serif; }
+  body[data-theme="regent"] .nora-action-btn { background: rgba(255,255,255,0.08); }
+  body[data-theme="regent"] .nora-action-btn svg { stroke: rgba(255,255,255,0.7); }
+  body[data-theme="regent"] .nora-expanded { background: #0A0A0A; }
+  body[data-theme="regent"] .nora-exp-avatar { background: #C9A84C; color: #0A0A0A; }
+  body[data-theme="regent"] .nora-exp-title { color: white; font-family: 'Anton', sans-serif; text-transform: uppercase; letter-spacing: 0.04em; }
+  body[data-theme="regent"] .nora-exp-subtitle { color: rgba(255,255,255,0.4); }
+  body[data-theme="regent"] .nora-chat-bubble { background: rgba(255,255,255,0.07); color: rgba(255,255,255,0.9); }
+  body[data-theme="regent"] .nora-sugg { background: rgba(201,168,76,0.12); color: rgba(255,255,255,0.8); border-color: rgba(201,168,76,0.2); }
+  body[data-theme="regent"] .nora-input { background: rgba(255,255,255,0.06); color: white; }
+  body[data-theme="regent"] .nora-input::placeholder { color: rgba(255,255,255,0.25); }
+  body[data-theme="regent"] .nora-send-btn { background: #C9A84C; }
+  body[data-theme="regent"] .nora-send-btn svg { stroke: #0A0A0A; }
+  body[data-theme="regent"] .promo-banner { background: white; box-shadow: 0 2px 12px rgba(0,0,0,0.08); }
+  body[data-theme="regent"] .promo-icon { background: rgba(201,168,76,0.1); }
+  body[data-theme="regent"] .promo-text-title { color: #0A0A0A; font-family: 'Anton', sans-serif; text-transform: uppercase; letter-spacing: 0.04em; font-size: 14px; }
+  body[data-theme="regent"] .promo-text-sub { color: #666; }
+  body[data-theme="regent"] .nav-logo { font-family: 'Anton', sans-serif; text-transform: uppercase; letter-spacing: 0.12em; font-size: 17px; }
+
+  /* Entrance animation */
+  .screen { animation: fadeIn 0.5s ease; }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+  .section, .nora-feature, .promo-banner {
+    animation: riseIn 0.6s ease backwards;
+  }
+  @keyframes riseIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+</style>
+</head>
+<body data-theme="ncl">
+
+<!-- Version badge -->
+<div style="font-family:'DM Sans',sans-serif;font-size:11px;font-weight:600;color:rgba(255,255,255,0.4);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:10px;text-align:center;">v32 — March 10 2026</div>
+
+<!-- Theme switcher -->
+<div class="theme-switcher">
+  <button class="theme-btn active" data-theme="ncl" onclick="setTheme('ncl')">Norwegian</button>
+  <button class="theme-btn" data-theme="oceania" onclick="setTheme('oceania')">Oceania</button>
+  <button class="theme-btn" data-theme="regent" onclick="setTheme('regent')">Regent</button>
+</div>
+
+<!-- iPhone shell -->
+<div class="phone-shell">
+  <div class="dynamic-island"></div>
+
+  <div class="screen">
+    <!-- Scrollable content -->
+    <div class="scroll-content" id="scroll-content">
+
+      <!-- STICKY TOP NAV — inside scroll container -->
+      <div class="top-nav" id="top-nav">
+      <div class="nav-menu">
+        <span></span><span></span><span></span>
+      </div>
+      <div class="nav-logo" id="nav-logo">
+        <span class="nav-logo-ncl"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 37.2 32"><g id="NCL-Logo-Shield-Black"><g id="Shield"><g><path d="M37.16,26.47s0-26.47,0-26.47H0v31.33s3.31-3.06,7.86-3.36c6.51-.43,9.2,2.75,15.38,3.8,7.55,1.29,12.48-3.35,13.64-4.7.28-.35.24-.44.27-.52v-.1Z"/><path style="fill:#e9e5dd" d="M3.52,25.64c1.25-.65,2.35-.99,4.98-1.14,6.34-.37,8.7,1.98,14.7,2.91,4.71.73,7.37-.32,9.38-1.61,1.06-.68.78-.5,1.34-.97.49-.41.61-.7.54-.99-.02-.09-.11-.09-.29.03-.14.09-.41.27-.41.27-4.72,3.29-10.9,1.36-16.3-.34-5.02-1.58-11.2-.89-13.99,1.1,0,0-.33.21-.57.57-.08.12-.26.6-.03.5.26-.12.46-.26.67-.36"/></g><polygon style="fill:#eae6de" points="10.86 17.45 5.52 10.44 5.52 17.45 3.12 17.45 3.12 6.42 5.36 6.42 10.53 13.21 10.53 6.42 12.93 6.42 12.93 17.45 10.86 17.45"/><path style="fill:#eae6de" d="M20.14,17.64c-3.25,0-5.66-2.51-5.66-5.68v-.03c0-3.14,2.36-5.71,5.75-5.71,2.08,0,3.33.69,4.35,1.7l-1.55,1.78c-.85-.77-1.72-1.25-2.82-1.25-1.86,0-3.2,1.54-3.2,3.44v.03c0,1.89,1.31,3.47,3.2,3.47,1.26,0,2.03-.5,2.9-1.29l1.55,1.56c-1.14,1.21-2.4,1.97-4.52,1.97"/><polygon style="fill:#eae6de" points="26.27 17.45 26.27 6.42 28.7 6.42 28.7 15.24 34.2 15.24 34.2 17.45 26.27 17.45"/></g></g></svg></span>
+        <span class="nav-logo-text" style="display:none"></span>
+      </div>
+      <button class="nav-find-cruises" onclick="window.open('https://www.ncl.com/vacations','_blank')" id="nav-find-cruises">Find Cruises</button>
+    </div>
+
+      <!-- HERO -->
+      <div class="hero">
+        <img class="hero-img" id="hero-img"
+          src="https://www.ncl.com/adobe/dynamicmedia/deliver/dm-aid--a10e0582-5ffa-470d-9148-12ab196cafc5/ncl-aqua-cruise-oceanboulevard-oceanwalk.jpg"
+          alt="cruise destination" />
+        <div class="hero-overlay" id="hero-overlay"></div>
+        <div class="hero-content">
+          <div class="hero-label" id="hero-label">The Great Life Sale</div>
+          <h1 class="hero-title" id="hero-title">VACATIONS<br>FROM $349 PP</h1>
+          <div class="hero-perks" id="hero-perks">
+            <div class="hero-perk">+ Free Unlimited Open Bar &amp; More*</div>
+            <div class="hero-perk">+ Free Balcony Upgrade*</div>
+          </div>
+          <button class="hero-cta" onclick="window.open('https://www.ncl.com/vacations','_blank')" id="hero-cta">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            SHOP NOW
+          </button>
+        </div>
+      </div>
+
+      <!-- DESTINATIONS -->
+      <div class="section" style="padding-top: 22px; padding-bottom: 10px;">
+        <div class="section-header">
+          <div class="section-title" id="dest-title">Where to?</div>
+          <div class="section-link" onclick="window.open('https://www.ncl.com/cruise-destinations','_blank')" style="cursor:pointer">View all</div>
+        </div>
+        <div class="chips-scroll">
+          <div class="chip active" onclick="window.open('https://www.ncl.com/cruise-destinations/bahamas-cruises','_blank')">Bahamas</div>
+          <div class="chip" onclick="window.open('https://www.ncl.com/cruise-destinations/caribbean-cruises','_blank')">Caribbean</div>
+          <div class="chip" onclick="window.open('https://www.ncl.com/cruise-destinations/alaska-cruises','_blank')">Alaska</div>
+          <div class="chip" onclick="window.open('https://www.ncl.com/cruise-destinations/hawaii-cruises','_blank')">Hawaii</div>
+          <div class="chip" onclick="window.open('https://www.ncl.com/cruise-destinations/northern-europe-cruises','_blank')">Europe</div>
+        </div>
+      </div>
+
+      <!-- VOYAGE CARDS -->
+      <div class="section" style="padding-top: 18px;">
+        <div class="section-header">
+          <div class="section-title" id="voyage-title">Featured Destinations</div>
+          <div class="section-link" onclick="window.open('https://www.ncl.com/cruise-destinations','_blank')" style="cursor:pointer">See all</div>
+        </div>
+        <div class="cards-scroll">
+          <div class="voyage-card">
+            <div class="card-img-wrap">
+              <img src="https://www.ncl.com/content/dam/ncl/us/en/itineraries/drupal_aqua/1440_GSC_GETAWAY3MIANASNPIMIA_6.jpg" alt="Great Stirrup Cay" />
+              <div class="card-badge">Deal</div>
+            </div>
+            <div class="card-body">
+              <div class="card-nights" id="card-nights-1">2-3 Day</div>
+              <div class="card-title">Weekend<br>Getaways</div>
+              <div class="card-footer">
+                <div class="card-price"><span class="card-price-affix">From </span>$349<span class="card-price-affix"> PP/USD</span></div>
+                <button class="card-btn" onclick="window.open('https://www.ncl.com/vacations?durations=2-3','_blank')">Book</button>
+              </div>
+            </div>
+          </div>
+          <div class="voyage-card">
+            <div class="card-img-wrap">
+              <img src="https://www.ncl.com/content/dam/ncl/us/en/destinations-ports/caribbean-central-america/bahamas/great-stirrup-cay/NCL-Bahamas-GSC-Cruise2.png" alt="Caribbean Cruises" />
+              <div class="card-badge">Price Drop</div>
+            </div>
+            <div class="card-body">
+              <div class="card-nights">4-7 Day</div>
+              <div class="card-title">Caribbean Cruises</div>
+              <div class="card-footer">
+                <div class="card-price"><span class="card-price-affix">From </span>$469<span class="card-price-affix"> PP/USD</span></div>
+                <button class="card-btn" onclick="window.open('https://www.ncl.com/vacations?destinations=CARIBBEAN&durations=4-7','_blank')">Book</button>
+              </div>
+            </div>
+          </div>
+          <div class="voyage-card">
+            <div class="card-img-wrap">
+              <img src="https://www.ncl.com/content/dam/ncl/us/en/itineraries/alaska-itineraries/NCL_1440_Encore_Alaska.jpg" alt="Alaska Cruises" />
+              <div class="card-badge">Popular</div>
+            </div>
+            <div class="card-body">
+              <div class="card-nights">7-14 Day</div>
+              <div class="card-title">Alaska Cruises</div>
+              <div class="card-footer">
+                <div class="card-price"><span class="card-price-affix">From </span>$599<span class="card-price-affix"> PP/USD</span></div>
+                <button class="card-btn" onclick="window.open('https://www.ncl.com/vacations?destinations=ALASKA&durations=7-14','_blank')">Book</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- NORA FEATURE SECTION -->
+      <div class="section" style="padding-top: 8px; padding-bottom: 8px;">
+        <div class="nora-feature" id="nora-feature">
+          <div class="nora-feature-bg"></div>
+          <div class="nora-tag">
+            <div class="nora-tag-dot"></div>
+            <span id="nora-tag-text">AI Travel Assistant</span>
+          </div>
+          <div class="nora-feature-title" id="nora-feature-title">Let Nora plan<br>your dream cruise</div>
+          <div class="nora-feature-subtitle" id="nora-feature-subtitle">Message me or choose a topic to start exploring ports, itineraries and destinations.</div>
+          <div class="nora-sample-prompts">
+            <div class="nora-prompt-pill" onclick="openNora()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 12h8M12 8v8"/></svg>
+              <span id="prompt1">"Show me weekend cruises"</span>
+            </div>
+            <div class="nora-prompt-pill" onclick="openNora()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg>
+              <span id="prompt2">"I want to explore. Show me inspiration"</span>
+            </div>
+            <div class="nora-prompt-pill" onclick="openNora()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              <span id="prompt3">"Can you help me with my booking?"</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PROMO BANNER -->
+      <div class="section" style="padding: 8px 0;">
+        <div class="promo-banner" id="promo-banner" onclick="window.open('https://www.ncl.com/cruise-deals/free-at-sea','_blank')" style="cursor:pointer">
+          <div class="promo-icon" id="promo-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" width="22" height="20" fill="#00484F">
+              <path d="M269.5 69.9c11.1-7.9 25.9-7.9 37 0C329 85.4 356.5 96 384 96c26.9 0 55.4-10.8 77.4-26.1c11.9-8.5 28.1-7.8 39.2 1.7c14.4 11.9 32.5 21 50.6 25.2c17.2 4 27.9 21.2 23.9 38.4s-21.2 27.9-38.4 23.9c-24.5-5.7-44.9-16.5-58.2-25C449.5 149.7 417 160 384 160c-31.9 0-60.6-9.9-80.4-18.9c-5.8-2.7-11.1-5.3-15.6-7.7c-4.5 2.4-9.7 5.1-15.6 7.7c-19.8 9-48.5 18.9-80.4 18.9c-33 0-65.5-10.3-94.5-25.8c-13.4 8.4-33.7 19.3-58.2 25c-17.2 4-34.4-6.7-38.4-23.9s6.7-34.4 23.9-38.4c18.1-4.2 36.2-13.3 50.6-25.2c11.1-9.5 27.3-10.1 39.2-1.7C136.7 85.2 165.1 96 192 96c27.5 0 55-10.6 77.5-26.1zm37 288C329 373.4 356.5 384 384 384c26.9 0 55.4-10.8 77.4-26.1c11.9-8.5 28.1-7.8 39.2 1.7c14.4 11.9 32.5 21 50.6 25.2c17.2 4 27.9 21.2 23.9 38.4s-21.2 27.9-38.4 23.9c-24.5-5.7-44.9-16.5-58.2-25C449.5 437.7 417 448 384 448c-31.9 0-60.6-9.9-80.4-18.9c-5.8-2.7-11.1-5.3-15.6-7.7c-4.5 2.4-9.7 5.1-15.6 7.7c-19.8 9-48.5 18.9-80.4 18.9c-33 0-65.5-10.3-94.5-25.8c-13.4 8.4-33.7 19.3-58.2 25c-17.2 4-34.4-6.7-38.4-23.9s6.7-34.4 23.9-38.4c18.1-4.2 36.2-13.3 50.6-25.2c11.1-9.5 27.3-10.1 39.2-1.7C136.7 373.2 165.1 384 192 384c27.5 0 55-10.6 77.5-26.1zm-37-144c11.1-7.9 25.9-7.9 37 0C329 229.4 356.5 240 384 240c26.9 0 55.4-10.8 77.4-26.1c11.9-8.5 28.1-7.8 39.2 1.7c14.4 11.9 32.5 21 50.6 25.2c17.2 4 27.9 21.2 23.9 38.4s-21.2 27.9-38.4 23.9c-24.5-5.7-44.9-16.5-58.2-25C449.5 293.7 417 304 384 304c-31.9 0-60.6-9.9-80.4-18.9c-5.8-2.7-11.1-5.3-15.6-7.7c-4.5 2.4-9.7 5.1-15.6 7.7c-19.8 9-48.5 18.9-80.4 18.9c-33 0-65.5-10.3-94.5-25.8c-13.4 8.4-33.7 19.3-58.2 25c-17.2 4-34.4-6.7-38.4-23.9s6.7-34.4 23.9-38.4c18.1-4.2 36.2-13.3 50.6-25.2c11.1-9.5 27.3-10.1 39.2-1.7C136.7 229.2 165.1 240 192 240c27.5 0 55-10.6 77.5-26.1z"/>
+            </svg>
+          </div>
+          <div>
+            <div class="promo-text-title" id="promo-title">Free at Sea™</div>
+            <div class="promo-text-sub" id="promo-sub">Unlimited Open Bar, Specialty Dining and more!</div>
+          </div>
+          <div class="promo-arrow">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- FLEET -->
+      <div class="section" style="padding-top: 8px; padding-bottom: 24px;">
+        <div class="section-header">
+          <div class="section-title" id="fleet-title">Our Fleet</div>
+          <div class="section-link" onclick="window.open('https://www.ncl.com/cruise-ships','_blank')" style="cursor:pointer">All ships</div>
+        </div>
+        <div class="ship-cards">
+          <div class="ship-card" onclick="window.open('https://www.ncl.com/cruise-ships/norwegian-aura','_blank')" style="cursor:pointer">
+            <img src="https://www.ncl.com/adobe/dynamicmedia/deliver/dm-aid--85296c2f-5c95-4d84-baed-44538ca1e76f/NCL-Aura-Cruise-Hero-shippage-jpg.webp?preferwebp=true&width=800" alt="Norwegian Aura" />
+            <div class="ship-card-overlay"></div>
+            <div class="card-badge">New</div>
+            <div class="ship-card-content">
+              <div class="ship-name" id="ship1">Norwegian Aura</div>
+              <div class="ship-guests">2027 | 3,840 Guests</div>
+            </div>
+          </div>
+          <div class="ship-card" onclick="window.open('https://www.ncl.com/cruise-ships/norwegian-luna','_blank')" style="cursor:pointer">
+            <img src="https://www.ncl.com/adobe/dynamicmedia/deliver/dm-aid--7f62d659-72d1-4079-ad65-e797152c47a6/NCL-Luna-Cruise-Hero-shippage-jpg.webp?preferwebp=true&width=800" alt="Norwegian Luna" />
+            <div class="ship-card-overlay"></div>
+            <div class="ship-card-content">
+              <div class="ship-name" id="ship2">Norwegian Luna</div>
+              <div class="ship-guests">2026 | 3,565 Guests</div>
+            </div>
+          </div>
+          <div class="ship-card" onclick="window.open('https://www.ncl.com/cruise-ships/norwegian-aqua','_blank')" style="cursor:pointer">
+            <img src="https://www.ncl.com/adobe/dynamicmedia/deliver/dm-aid--822da160-e42b-412f-808a-d0fe68bcd239/NCL-Aqua-Cruise-Hero2-jpg.webp?preferwebp=true&width=800" alt="Norwegian Aqua" />
+            <div class="ship-card-overlay"></div>
+            <div class="ship-card-content">
+              <div class="ship-name" id="ship3">Norwegian Aqua</div>
+              <div class="ship-guests">2025 | 3,571 Guests</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- FOOTER DISCLAIMER -->
+      <div class="footer-disclaimer" id="footer-disclaimer">
+        <div class="footer-divider"></div>
+        <p class="footer-text">View all applicable terms &amp; conditions for promotions <a class="footer-link" href="#">here</a>.</p>
+      </div>
+
+    </div><!-- /scroll-content -->
+
+    <!-- STICKY NORA FOOTER -->
+    <div class="nora-footer" id="nora-footer">
+      <div class="nora-footer-inner" onclick="openNora()">
+        <div class="nora-avatar" id="nora-avatar-small">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 88 88" width="34" height="34">
+            <defs>
+              <linearGradient id="noraGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%"   stop-color="#00484F"/>
+                <stop offset="40%"  stop-color="#68ACAA"/>
+                <stop offset="70%"  stop-color="#C8B560"/>
+                <stop offset="100%" stop-color="#E6CD88"/>
+              </linearGradient>
+            </defs>
+            <circle cx="44" cy="44" r="44" fill="url(#noraGrad)"/>
+            <path d="M30 26 L33.5 38.5 L46 42 L33.5 45.5 L30 58 L26.5 45.5 L14 42 L26.5 38.5 Z" fill="white"/>
+            <path d="M57 18 L59.5 26.5 L68 29 L59.5 31.5 L57 40 L54.5 31.5 L46 29 L54.5 26.5 Z" fill="white"/>
+            <path d="M57 54 L58.6 59.4 L64 61 L58.6 62.6 L57 68 L55.4 62.6 L50 61 L55.4 59.4 Z" fill="white"/>
+          </svg>
+        </div>
+        <div class="nora-placeholder" id="nora-placeholder">Find A Cruise With Nora</div>
+        <div class="nora-actions">
+          <div class="nora-action-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+              <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+              <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+            </svg>
+          </div>
+          <div class="nora-action-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+              <circle cx="11" cy="11" r="8"/>
+              <path d="m21 21-4.35-4.35"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- NORA EXPANDED PANEL -->
+    <div class="nora-expanded" id="nora-expanded">
+      <div class="nora-exp-handle" onclick="closeNora()"></div>
+      <div class="nora-exp-header">
+        <div class="nora-exp-avatar" id="nora-exp-avatar"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 88 88" width="44" height="44">
+            <defs>
+              <linearGradient id="noraGradExp" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%"   stop-color="#00484F"/>
+                <stop offset="40%"  stop-color="#68ACAA"/>
+                <stop offset="70%"  stop-color="#C8B560"/>
+                <stop offset="100%" stop-color="#E6CD88"/>
+              </linearGradient>
+            </defs>
+            <circle cx="44" cy="44" r="44" fill="url(#noraGradExp)"/>
+            <path d="M30 26 L33.5 38.5 L46 42 L33.5 45.5 L30 58 L26.5 45.5 L14 42 L26.5 38.5 Z" fill="white"/>
+            <path d="M57 18 L59.5 26.5 L68 29 L59.5 31.5 L57 40 L54.5 31.5 L46 29 L54.5 26.5 Z" fill="white"/>
+            <path d="M57 54 L58.6 59.4 L64 61 L58.6 62.6 L57 68 L55.4 62.6 L50 61 L55.4 59.4 Z" fill="white"/>
+          </svg></div>
+        <div>
+          <div class="nora-exp-title" id="nora-exp-title">Nora</div>
+          <div class="nora-exp-subtitle" id="nora-exp-subtitle">Your AI Assistant · Online</div>
+        </div>
+      </div>
+      <div class="nora-chat-bubble" id="nora-chat-bubble">
+        Hi, I'm Nora! I'm a Generative AI assistant here to help plan your dream vacation.
+      </div>
+      <div class="nora-sugg-title">Suggested Topics</div>
+      <div class="nora-suggestions">
+        <div class="nora-sugg" id="sugg1">Show me weekend cruises</div>
+        <div class="nora-sugg" id="sugg2">I want to explore. Show me inspiration</div>
+        <div class="nora-sugg" id="sugg3">Can you help me with my booking?</div>
+      </div>
+      <div class="nora-input-row">
+        <input type="text" class="nora-input" id="nora-input" placeholder="Enter your message here" />
+        <button class="nora-send-btn" onclick="window.open('https://www.ncl.com/ai-assistant','_blank')" id="nora-send">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+        </button>
+      </div>
+    </div>
+
+  </div><!-- /screen -->
+</div><!-- /phone-shell -->
+
+<script>
+const themes = {
+  ncl: {
+    logo: 'Norwegian',
+    heroImg: 'https://www.ncl.com/adobe/dynamicmedia/deliver/dm-aid--a10e0582-5ffa-470d-9148-12ab196cafc5/ncl-aqua-cruise-oceanboulevard-oceanwalk.jpg',
+    heroLabel: 'Featured Voyage',
+    heroTitle: 'Sail the\nMediterranean',
+    heroCtaText: 'Explore Itinerary',
+    destTitle: 'Where to?',
+    voyageTitle: 'Featured Destinations',
+    noraTagText: 'AI Travel Assistant',
+    noraTitle: 'Let Nora plan\nyour perfect voyage',
+    noraSub: "Tell Nora your dream cruise and she'll find the perfect itinerary — destinations, budget, dates and more.",
+    prompt1: '"Find a family cruise under $1,200pp"',
+    prompt2: '"Best Mediterranean ports in July"',
+    prompt3: '"Compare Alaska vs Caribbean"',
+    promoTitle: 'Free at Sea™',
+    promoSub: 'Open bar, dining, excursions & more included on select sailings',
+    fleetTitle: 'Our Fleet',
+    ship1: 'Norwegian Aura',
+    ship2: 'Norwegian Luna',
+    ship3: 'Norwegian Aqua',
+    noraPlaceholder: 'Ask Nora to plan your cruise...',
+    noraExpTitle: 'Nora',
+    noraExpSub: 'Your AI cruise planner · Online',
+    noraChatBubble: "Hi! I'm Nora, your personal cruise planner. Tell me what kind of vacation you're dreaming about and I'll find the perfect voyage for you. 🌊",
+    noraInputPlaceholder: 'Where do you want to sail?',
+    sugg1: 'Family friendly', sugg2: 'Romantic getaway', sugg3: 'Best value', sugg4: 'Adventure cruise',
+  },
+  oceania: {
+    logo: 'Oceania',
+    heroImg: 'https://images.unsplash.com/photo-1503899036084-c55cdd92da26?w=800&q=85',
+    heroLabel: 'Epicurean Collection',
+    heroTitle: 'Taste the\nWorld\'s Finest',
+    heroCtaText: 'Discover Voyages',
+    destTitle: 'Destinations',
+    voyageTitle: 'Epicurean Voyages',
+    noraTagText: 'AI Voyage Concierge',
+    noraTitle: 'Let Nora craft\nyour culinary journey',
+    noraSub: 'From Bordeaux to Bali, Nora curates voyages around your palate, passion, and preferred pace.',
+    prompt1: '"Culinary voyage in southern Europe"',
+    prompt2: '"Small ship, exotic ports, 14 nights"',
+    prompt3: '"Wine & dining cruises in France"',
+    promoTitle: 'Simply More™',
+    promoSub: 'Shore excursions, drinks & more — graciously included on every voyage',
+    fleetTitle: 'Our Ships',
+    ship1: 'Oceania Allura',
+    ship2: 'Vista',
+    ship3: 'Riviera',
+    noraPlaceholder: 'Ask Nora to curate your voyage...',
+    noraExpTitle: 'Nora',
+    noraExpSub: 'Your personal voyage concierge',
+    noraChatBubble: "Buongiorno! I'm Nora, your Oceania voyage concierge. Tell me about your ideal culinary adventure and I'll craft something extraordinary. 🍷",
+    noraInputPlaceholder: 'What culinary experience awaits you?',
+    sugg1: 'Wine & cuisine', sugg2: 'Small ship ports', sugg3: 'Mediterranean', sugg4: 'Asia discovery',
+  },
+  regent: {
+    logo: 'REGENT',
+    heroImg: 'https://images.unsplash.com/photo-1543872084-c7bd3822856f?w=800&q=85',
+    heroLabel: 'Unrivaled at Sea',
+    heroTitle: 'Nobody\nDoes It\nBetter',
+    heroCtaText: 'Explore Voyages',
+    destTitle: 'Destinations',
+    voyageTitle: 'Signature Voyages',
+    noraTagText: 'AI Luxury Concierge',
+    noraTitle: 'YOUR PERSONAL\nVOYAGE CURATOR',
+    noraSub: 'Nora understands ultra-luxury. Describe your ideal voyage and receive a bespoke recommendation in moments.',
+    prompt1: '"World cruise departure options"',
+    prompt2: '"Ultra-luxury suite availability"',
+    prompt3: '"Private charter experiences"',
+    promoTitle: 'ALL-INCLUSIVE',
+    promoSub: 'Unlimited shore excursions, premium spirits, speciality dining & more',
+    fleetTitle: 'The Fleet',
+    ship1: 'Seven Seas Prestige',
+    ship2: 'Seven Seas Explorer',
+    ship3: 'Seven Seas Grandeur',
+    noraPlaceholder: 'Describe your ideal luxury voyage...',
+    noraExpTitle: 'NORA',
+    noraExpSub: 'Ultra-luxury voyage curator',
+    noraChatBubble: "Welcome. I'm Nora, your personal Regent voyage curator. Every journey is unique — tell me your vision and I'll make it extraordinary. ✦",
+    noraInputPlaceholder: 'What does your perfect voyage look like?',
+    sugg1: 'World cruise', sugg2: 'Exclusive suites', sugg3: 'Private charter', sugg4: 'Rare ports',
+  }
+};
+
+function setTheme(theme) {
+  document.body.setAttribute('data-theme', theme);
+
+  // Update buttons
+  document.querySelectorAll('.theme-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.theme === theme);
+  });
+
+  // Apply content
+  const t = themes[theme];
+  const navLogoEl = document.getElementById('nav-logo');
+  const nclLogoSpan = navLogoEl.querySelector('.nav-logo-ncl');
+  const textLogoSpan = navLogoEl.querySelector('.nav-logo-text');
+  if (theme === 'ncl') {
+    nclLogoSpan.style.display = 'flex';
+    textLogoSpan.style.display = 'none';
+  } else {
+    nclLogoSpan.style.display = 'none';
+    textLogoSpan.style.display = 'block';
+    textLogoSpan.textContent = t.logo;
+  }
+  // Update Find Cruises button label per brand
+  const findBtn = document.getElementById('nav-find-cruises');
+  if (findBtn) findBtn.textContent = theme === 'regent' ? 'Book Now' : 'Find Cruises';
+  document.getElementById('hero-img').src = t.heroImg;
+  document.getElementById('hero-label').textContent = t.heroLabel;
+  document.getElementById('hero-title').innerHTML = t.heroTitle.replace('\n', '<br>').replace('\n', '<br>');
+  document.getElementById('hero-cta').innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>${t.heroCtaText}`;
+  document.getElementById('dest-title').textContent = t.destTitle;
+  document.getElementById('voyage-title').textContent = t.voyageTitle;
+  document.getElementById('nora-tag-text').textContent = t.noraTagText;
+  document.getElementById('nora-feature-title').innerHTML = t.noraTitle.replace('\n', '<br>');
+  document.getElementById('nora-feature-subtitle').textContent = t.noraSub;
+  document.getElementById('prompt1').textContent = t.prompt1;
+  document.getElementById('prompt2').textContent = t.prompt2;
+  document.getElementById('prompt3').textContent = t.prompt3;
+  document.getElementById('promo-title').textContent = t.promoTitle;
+  document.getElementById('promo-sub').textContent = t.promoSub;
+  document.getElementById('fleet-title').textContent = t.fleetTitle;
+  document.getElementById('ship1').textContent = t.ship1;
+  document.getElementById('ship2').textContent = t.ship2;
+  document.getElementById('ship3').textContent = t.ship3;
+  document.getElementById('nora-placeholder').textContent = t.noraPlaceholder;
+  document.getElementById('nora-exp-title').textContent = t.noraExpTitle;
+  document.getElementById('nora-exp-subtitle').textContent = t.noraExpSub;
+  document.getElementById('nora-chat-bubble').textContent = t.noraChatBubble;
+  document.getElementById('nora-input').placeholder = t.noraInputPlaceholder;
+  document.getElementById('sugg1').textContent = t.sugg1;
+  document.getElementById('sugg2').textContent = t.sugg2;
+  document.getElementById('sugg3').textContent = t.sugg3;
+  document.getElementById('sugg4').textContent = t.sugg4;
+
+  // Close Nora panel when switching themes
+  closeNora();
+
+  // Scroll back to top
+  document.getElementById('scroll-content').scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function openNora() {
+  document.getElementById('nora-expanded').classList.add('open');
+}
+
+function closeNora() {
+  document.getElementById('nora-expanded').classList.remove('open');
+}
+
+// Chip interactivity
+document.querySelectorAll('.chip').forEach(chip => {
+  chip.addEventListener('click', function() {
+    document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+    this.classList.add('active');
+  });
+});
+
+// Close Nora on outside click
+document.getElementById('scroll-content').addEventListener('click', function(e) {
+  if (!e.target.closest('.nora-prompt-pill')) closeNora();
+});
+
+// Sticky nav — transitions to solid white on scroll
+const scrollContent = document.getElementById('scroll-content');
+const topNav = document.getElementById('top-nav');
+scrollContent.addEventListener('scroll', function() {
+  if (scrollContent.scrollTop > 80) {
+    topNav.classList.add('scrolled');
+  } else {
+    topNav.classList.remove('scrolled');
+  }
+});
+</script>
+</body>
+</html>
