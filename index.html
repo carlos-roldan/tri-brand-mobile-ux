@@ -1582,6 +1582,7 @@ const themes = {
     noraChatBubble: "Hi! I'm Nora, your personal cruise planner. Tell me what kind of vacation you're dreaming about and I'll find the perfect voyage for you. 🌊",
     noraInputPlaceholder: 'Where do you want to sail?',
     sugg1: 'Family friendly', sugg2: 'Romantic getaway', sugg3: 'Best value', sugg4: 'Adventure cruise',
+    ready: true,
   },
   oceania: {
     logo: 'Oceania',
@@ -1609,6 +1610,7 @@ const themes = {
     noraChatBubble: "Buongiorno! I'm Nora, your Oceania voyage concierge. Tell me about your ideal culinary adventure and I'll craft something extraordinary. 🍷",
     noraInputPlaceholder: 'What culinary experience awaits you?',
     sugg1: 'Wine & cuisine', sugg2: 'Small ship ports', sugg3: 'Mediterranean', sugg4: 'Asia discovery',
+    ready: false,
   },
   regent: {
     logo: 'REGENT',
@@ -1636,6 +1638,7 @@ const themes = {
     noraChatBubble: "Welcome. I'm Nora, your personal Regent voyage curator. Every journey is unique — tell me your vision and I'll make it extraordinary. ✦",
     noraInputPlaceholder: 'What does your perfect voyage look like?',
     sugg1: 'World cruise', sugg2: 'Exclusive suites', sugg3: 'Private charter', sugg4: 'Rare ports',
+    ready: false,
   }
 };
 
@@ -1675,12 +1678,6 @@ function setTheme(theme) {
   document.getElementById('prompt1').textContent = t.prompt1;
   document.getElementById('prompt2').textContent = t.prompt2;
   document.getElementById('prompt3').textContent = t.prompt3;
-  document.getElementById('promo-title').textContent = t.promoTitle;
-  document.getElementById('promo-sub').textContent = t.promoSub;
-  document.getElementById('fleet-title').textContent = t.fleetTitle;
-  document.getElementById('ship1').textContent = t.ship1;
-  document.getElementById('ship2').textContent = t.ship2;
-  document.getElementById('ship3').textContent = t.ship3;
   // nora-placeholder stays fixed as 'Find A Cruise With Nora' across all brands
   document.getElementById('nora-exp-title').textContent = t.noraExpTitle;
   document.getElementById('nora-exp-subtitle').textContent = t.noraExpSub;
@@ -1690,6 +1687,16 @@ function setTheme(theme) {
   document.getElementById('sugg2').textContent = t.sugg2;
   document.getElementById('sugg3').textContent = t.sugg3;
   document.getElementById('sugg4').textContent = t.sugg4;
+
+  // Only update promo + fleet content when brand is fully built out
+  if (t.ready) {
+    document.getElementById('promo-title').textContent = t.promoTitle;
+    document.getElementById('promo-sub').textContent = t.promoSub;
+    document.getElementById('fleet-title').textContent = t.fleetTitle;
+    document.getElementById('ship1').textContent = t.ship1;
+    document.getElementById('ship2').textContent = t.ship2;
+    document.getElementById('ship3').textContent = t.ship3;
+  }
 
   // Close Nora panel when switching themes
   closeNora();
