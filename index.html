@@ -1672,24 +1672,24 @@ function setTheme(theme) {
   document.getElementById('hero-cta').innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>${t.heroCtaText}`;
   document.getElementById('dest-title').textContent = t.destTitle;
   document.getElementById('voyage-title').textContent = t.voyageTitle;
-  document.getElementById('nora-tag-text').textContent = t.noraTagText;
-  document.getElementById('nora-feature-title').innerHTML = t.noraTitle.replace('\n', '<br>');
-  document.getElementById('nora-feature-subtitle').textContent = t.noraSub;
-  document.getElementById('prompt1').textContent = t.prompt1;
-  document.getElementById('prompt2').textContent = t.prompt2;
-  document.getElementById('prompt3').textContent = t.prompt3;
   // nora-placeholder stays fixed as 'Find A Cruise With Nora' across all brands
-  document.getElementById('nora-exp-title').textContent = t.noraExpTitle;
-  document.getElementById('nora-exp-subtitle').textContent = t.noraExpSub;
-  document.getElementById('nora-chat-bubble').textContent = t.noraChatBubble;
-  document.getElementById('nora-input').placeholder = t.noraInputPlaceholder;
-  document.getElementById('sugg1').textContent = t.sugg1;
-  document.getElementById('sugg2').textContent = t.sugg2;
-  document.getElementById('sugg3').textContent = t.sugg3;
-  document.getElementById('sugg4').textContent = t.sugg4;
 
-  // Only update promo + fleet content when brand is fully built out
+  // Only update Nora component, promo and fleet content when brand is fully built out
   if (t.ready) {
+    document.getElementById('nora-tag-text').textContent = t.noraTagText;
+    document.getElementById('nora-feature-title').innerHTML = t.noraTitle.replace('\n', '<br>');
+    document.getElementById('nora-feature-subtitle').textContent = t.noraSub;
+    document.getElementById('prompt1').textContent = t.prompt1;
+    document.getElementById('prompt2').textContent = t.prompt2;
+    document.getElementById('prompt3').textContent = t.prompt3;
+    document.getElementById('nora-exp-title').textContent = t.noraExpTitle;
+    document.getElementById('nora-exp-subtitle').textContent = t.noraExpSub;
+    document.getElementById('nora-chat-bubble').textContent = t.noraChatBubble;
+    document.getElementById('nora-input').placeholder = t.noraInputPlaceholder;
+    document.getElementById('sugg1').textContent = t.sugg1;
+    document.getElementById('sugg2').textContent = t.sugg2;
+    document.getElementById('sugg3').textContent = t.sugg3;
+    document.getElementById('sugg4').textContent = t.sugg4;
     document.getElementById('promo-title').textContent = t.promoTitle;
     document.getElementById('promo-sub').textContent = t.promoSub;
     document.getElementById('fleet-title').textContent = t.fleetTitle;
