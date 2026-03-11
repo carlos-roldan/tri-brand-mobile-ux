@@ -84,28 +84,50 @@
     border-radius: 50px;
   }
 
-  /* Full bleed on real iPhone — extend behind Dynamic Island */
+  /* Full bleed on real iPhone */
   @media (max-width: 767px) {
-    body {
+    html, body {
       padding: 0 !important;
-      background: #000;
+      margin: 0 !important;
+      background: #EBE7DF !important;
+      min-height: 100%;
+      height: auto !important;
+      overflow: auto !important;
     }
     .phone-shell {
-      width: 100vw !important;
-      height: 100vh !important;
-      height: 100dvh !important;
+      width: 100% !important;
+      height: auto !important;
+      min-height: 100vh !important;
       border-radius: 0 !important;
       box-shadow: none !important;
+      background: transparent !important;
+      overflow: visible !important;
     }
     .screen {
       border-radius: 0 !important;
-      inset: 0 !important;
+      position: relative !important;
+      inset: auto !important;
+      overflow: visible !important;
+      min-height: 100vh !important;
+    }
+    .scroll-content {
+      overflow: visible !important;
+      height: auto !important;
+      max-height: none !important;
     }
     .top-nav {
-      padding-top: max(62px, env(safe-area-inset-top) + 14px) !important;
+      padding-top: max(54px, env(safe-area-inset-top) + 10px) !important;
     }
     .dynamic-island {
       display: none !important;
+    }
+    .nora-footer {
+      position: fixed !important;
+      bottom: 0 !important;
+      bottom: env(safe-area-inset-bottom) !important;
+      left: 0 !important;
+      right: 0 !important;
+      z-index: 999 !important;
     }
   }
 
@@ -957,6 +979,11 @@
   /* NCL */
   /* === NCL THEME — Brand-accurate (Nov 2025 Guidelines) === */
   body[data-theme="ncl"] .screen { background: #EBE7DF; }
+  @media (max-width: 767px) {
+    body[data-theme="ncl"] { background: #EBE7DF !important; }
+    body[data-theme="oceania"] { background: #FAF6F0 !important; }
+    body[data-theme="regent"] { background: #F8F8F8 !important; }
+  }
   body[data-theme="ncl"] .section { background: #EBE7DF; }
 
   /* Typography — Poppins SemiBold ALL CAPS + Besley Italic accent */
